@@ -2,7 +2,6 @@ package logger
 
 import (
 	"bytes"
-	"fmt"
 	"log"
 	"os"
 )
@@ -76,6 +75,5 @@ func constructFormat(color logcolor, nArgs int) string {
 		}
 	}
 	buf.WriteString("\033[0m \n")
-	fmt.Printf("%q \n", buf.String())
 	return buf.String()
 }
