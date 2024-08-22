@@ -3,14 +3,13 @@ package service
 import (
 	"context"
 	"errors"
-	"time"
 
 	"github.com/saikrir/keep-notes/internal/logger"
 )
 
 type UserNote struct {
 	ID, Description, Status string
-	CreatedAt               time.Time
+	CreatedAt               string
 }
 
 type Store interface {

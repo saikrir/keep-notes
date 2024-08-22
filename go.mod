@@ -6,3 +6,5 @@ require (
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/sijms/go-ora v1.3.2
 )
+
+require github.com/mattn/go-sqlite3 v1.14.22 // indirect
