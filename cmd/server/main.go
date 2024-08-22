@@ -1,10 +1,7 @@
 package main
 
 import (
-	"context"
-	"fmt"
 	"runtime"
-	"strings"
 
 	"github.com/saikrir/keep-notes/internal/database"
 	"github.com/saikrir/keep-notes/internal/logger"
@@ -17,21 +14,12 @@ func Run() error {
 	if err != nil {
 		panic(err.Error())
 	}
-	db.InitSchema()
-	note := service.UserNote{Description: "Sample Note2"}
-	if err := db.CreateNote(context.Background(), note); err != nil {
-		logger.Error("Failed to insert Row ", err)
+	if err = db.InitSchema(); err != nil {
+		panic(err.Error())
 	}
-	logger.Info("ROWS Inserted ")
 
-	row, err := db.GetNote(context.Background(), "1")
-	fmt.Println("Qurty ", row)
-
-	row.Description = "DuFFY"
-
-	results, err := db.SearchNotes(context.Background(), strings.ToLower("Sam"))
-	logger.Info("Results ", results)
-
+	noteSvc := service.NewUserNotesService(db)
+	logger.Info("Service initialized ", noteSvc)
 	return nil
 }
 

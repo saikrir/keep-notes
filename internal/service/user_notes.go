@@ -52,17 +52,17 @@ func (userNoteSvc *UserNotesService) FindNote(ctx context.Context, ID string) (U
 	return userNote, nil
 }
 func (userNoteSvc *UserNotesService) SearchNotes(ctx context.Context, searchTxt string) ([]UserNote, error) {
-	return nil, ErrNotImplemented
+	return userNoteSvc.store.SearchNote(ctx, searchTxt)
 }
 
 func (userNoteSvc *UserNotesService) NewNote(ctx context.Context, userNote UserNote) (UserNote, error) {
-	return UserNote{}, ErrNotImplemented
+	return userNoteSvc.store.CreateNote(ctx, userNote)
 }
 
 func (userNoteSvc *UserNotesService) UpdateNote(ctx context.Context, ID string, userNote UserNote) (UserNote, error) {
-	return UserNote{}, ErrNotImplemented
+	return userNoteSvc.store.UpdateNote(ctx, ID, userNote)
 }
 
 func (userNoteSvc *UserNotesService) RemoveNote(ctx context.Context, ID string) (UserNote, error) {
-	return UserNote{}, ErrNotImplemented
+	return userNoteSvc.store.DeleteNote(ctx, ID)
 }

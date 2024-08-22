@@ -54,7 +54,7 @@ func (db *Database) InitSchema() error {
 	return nil
 }
 
-func (db *Database) CreateNote(ctx context.Context, note service.UserNote) error {
+func (db *Database) CreateNote(ctx context.Context, note service.UserNote) (service.UserNote, error) {
 	insertSQL := "INSERT INTO T_USER_NOTES(DESCRIPTION) values(:description) "
 	userNoteRow := ToUserNoteRow(note)
 
@@ -70,7 +70,7 @@ func (db *Database) CreateNote(ctx context.Context, note service.UserNote) error
 	}
 
 	logger.Info("Transaction committed")
-	return nil
+	return note, nil
 }
 
 func (db *Database) UpdateNote(ctx context.Context, ID string, existingNote service.UserNote) (service.UserNote, error) {
@@ -122,7 +122,7 @@ func (db *Database) GetNote(ctx context.Context, noteId string) (service.UserNot
 	return ToUserNote(userNoteRow), nil
 }
 
-func (db *Database) SearchNotes(ctx context.Context, searchTxt string) ([]service.UserNote, error) {
+func (db *Database) SearchNote(ctx context.Context, searchTxt string) ([]service.UserNote, error) {
 	var (
 		searchResults []service.UserNote
 		returnRows    []UserNoteRow
