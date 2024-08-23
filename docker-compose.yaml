@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  db:
+    image: gvenzl/oracle-xe
+    container_name: notes-oracle-db
+    ports:
+      - 1521:1521
+    env_file:
+      - oracle.env
+    volumes:
+      - oracle-volume:/u01/app/oracle/oradata
+      - ./db_scripts:/container-entrypoint-initdb.d
+    networks:
+      - fullstack
+
+networks:
+  fullstack:
+    driver: bridge
+
+volumes:
+  oracle-volume:

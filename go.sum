@@ -8,5 +8,5 @@ github.com/lib/pq v1.10.9 h1:YXG7RB+JIjhP29X+OtkiDnYaXQwpS4JEWq7dtCCRUEw=
 github.com/lib/pq v1.10.9/go.mod h1:AlVN5x4E4T544tWzH6hKfbfQvm3HdbOxrmggDNAPY9o=
 github.com/mattn/go-sqlite3 v1.14.22 h1:2gZY6PC6kBnID23Tichd1K+Z0oS6nE/XwU+Vz/5o4kU=
 github.com/mattn/go-sqlite3 v1.14.22/go.mod h1:Uh1q+B4BYcTPb+yiD3kU8Ct7aC0hY9fxUwlHK0RXw+Y=
-github.com/sijms/go-ora v1.3.2 h1:v9Ca63acRbrE5vYlHpABzlOvt8bI1Sj5PCVDwaAJjp8=
-github.com/sijms/go-ora v1.3.2/go.mod h1:ZGVmJgxUfyGIVmYgA7MVGEq6BX5aoFECRMtHW5DEcs4=
+github.com/sijms/go-ora/v2 v2.8.19 h1:7LoKZatDYGi18mkpQTR/gQvG9yOdtc7hPAex96Bqisc=
+github.com/sijms/go-ora/v2 v2.8.19/go.mod h1:EHxlY6x7y9HAsdfumurRfTd+v8NrEOTR3Xl4FWlH6xk=
