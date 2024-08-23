@@ -10,7 +10,7 @@ services:
       - oracle.env
     volumes:
       - oracle-volume:/u01/app/oracle/oradata
-      - ./db_scripts:/container-entrypoint-initdb.d
+      - ./db_scripts:/container-entrypoint-startdb.d
     networks:
       - fullstack
 
