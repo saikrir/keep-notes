@@ -4,14 +4,14 @@ import (
 	"context"
 	"runtime"
 
-	"github.com/saikrir/keep-notes/internal/database"
+	"github.com/saikrir/keep-notes/internal/datastore"
 	"github.com/saikrir/keep-notes/internal/logger"
 	"github.com/saikrir/keep-notes/internal/service"
 )
 
 func Run() error {
 	logger.Info("RUNNING ON ", runtime.GOOS, " Architecutre ", runtime.GOARCH)
-	db, err := database.NewDatabase()
+	db, err := datastore.NewOracleStore()
 
 	if err != nil {
 		logger.Error("Failed to Connect to DB ", err)
