@@ -7,7 +7,7 @@ services:
     ports:
       - 1521:1521
     env_file:
-      - .env
+      - ora.env
     volumes:
       - oracle-volume:/u01/app/oracle/oradata
       - ./db_scripts:/container-entrypoint-startdb.d

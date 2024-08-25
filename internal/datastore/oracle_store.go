@@ -7,8 +7,10 @@ import (
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/saikrir/keep-notes/internal/env"
 	"github.com/saikrir/keep-notes/internal/logger"
 	"github.com/saikrir/keep-notes/internal/service"
+
 	go_ora "github.com/sijms/go-ora/v2"
 )
 
@@ -27,21 +29,31 @@ var ErrNoRowsFound = errors.New("no Rows found for query criteria ")
 
 func NewOracleStore() (*OracleStore, error) {
 
-	connStr := go_ora.BuildUrl("localhost", 1521, "XEPDB1", "APP_USER", "tempid1", nil)
-	logger.Info("DB Str", connStr)
+	// Need following env vars
+	// $DB_HOST, $DB_PORT, $DB_NAME, $DB_USER, $DB_PASS
+
+	connStr := go_ora.BuildUrl(
+		env.GetEnvValAsString("DB_HOST"),
+		env.GetEnvValAsNumber("DB_PORT"),
+		env.GetEnvValAsString("DB_NAME"),
+		env.GetEnvValAsString("DB_USER"),
+		env.GetEnvValAsString("DB_PASS"),
+		nil)
+
+	logger.Debug("DB Str", connStr)
 
 	conn, err := sqlx.Connect("oracle", connStr)
 
 	if err != nil {
-		logger.Error("Failed to connect to db ", err)
+		logger.Error(fmt.Sprintf("Failed to connect to db with conn str %s", connStr), err)
 		return nil, err
 	}
 	if err = conn.Ping(); err != nil {
-		logger.Error("Failed to Ping db ", err)
+		logger.Error(fmt.Sprintf("Failed to ping db with conn str %s", connStr), err)
 		return nil, err
 	}
 
-	logger.Info("Connect to db")
+	logger.Debug("Connect to db")
 
 	return &OracleStore{Client: conn}, nil
 }

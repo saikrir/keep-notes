@@ -25,7 +25,7 @@ var (
 	ErrNoNotesFound         = errors.New("no userNotes were found for given ID")
 	ErrNoSearchResultsFound = errors.New("no userNotes were found that matched the given criteria")
 	ErrNotImplemented       = errors.New("this functionality is currently not implemented")
-	ErrFindingNote          = errors.New("faailed to find userNote")
+	ErrFindingNote          = errors.New("failed to find userNote")
 	ErrCreation             = errors.New("failed to create userNote")
 	ErrUpdate               = errors.New("failed to update userNote")
 	ErrDelete               = errors.New("failed to delete userNote")
@@ -43,14 +43,7 @@ func NewUserNotesService(store Store) *UserNotesService {
 
 func (userNoteSvc *UserNotesService) FindNote(ctx context.Context, ID string) (UserNote, error) {
 	logger.Debug("will try and locate Note with Id", ID)
-
-	userNote, err := userNoteSvc.store.GetNote(ctx, ID)
-	if err != nil {
-		logger.Error("Failed to find Note ", err)
-		return UserNote{}, ErrFindingNote
-	}
-
-	return userNote, nil
+	return userNoteSvc.store.GetNote(ctx, ID)
 }
 func (userNoteSvc *UserNotesService) SearchNotes(ctx context.Context, searchTxt string) ([]UserNote, error) {
 	return userNoteSvc.store.SearchNote(ctx, searchTxt)

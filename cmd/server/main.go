@@ -1,35 +1,34 @@
 package main
 
 import (
-	"context"
 	"runtime"
 
 	"github.com/saikrir/keep-notes/internal/datastore"
+	"github.com/saikrir/keep-notes/internal/env"
 	"github.com/saikrir/keep-notes/internal/logger"
 	"github.com/saikrir/keep-notes/internal/service"
+	"github.com/saikrir/keep-notes/internal/transport/api"
 )
+
+const ApiRootContext = "/v1/notesvc"
 
 func Run() error {
 	logger.Info("RUNNING ON ", runtime.GOOS, " Architecutre ", runtime.GOARCH)
-	db, err := datastore.NewOracleStore()
+	dataStore, err := datastore.NewOracleStore()
 
 	if err != nil {
 		logger.Error("Failed to Connect to DB ", err)
-		panic(err.Error())
+		return err
 	}
 
-	appNote := service.UserNote{
-		Description: "Sample",
-		Status:      "Active",
-	}
-
-	if _, err := db.CreateNote(context.Background(), appNote); err != nil {
-		logger.Error("Failed to create row ", err)
-	}
-
-	return nil
+	noteSvc := service.NewUserNotesService(dataStore)
+	handler := api.NewHandler("/v1/notesvc", env.GetEnvValAsNumber("API_PORT"), noteSvc)
+	return handler.Serve()
 }
 
 func main() {
-	Run()
+	if err := Run(); err != nil {
+		logger.Error("App will halt ", err)
+		panic(err.Error())
+	}
 }
