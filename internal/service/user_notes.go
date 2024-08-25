@@ -3,13 +3,14 @@ package service
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/saikrir/keep-notes/internal/logger"
 )
 
 type UserNote struct {
 	ID, Description, Status string
-	CreatedAt               string
+	CreatedAt               time.Time
 }
 
 type Store interface {
@@ -21,13 +22,13 @@ type Store interface {
 }
 
 var (
-	ErrNoNotesFound         = errors.New("No userNotes were found for given ID")
-	ErrNoSearchResultsFound = errors.New("No userNotes were found that matched the given criteria")
-	ErrNotImplemented       = errors.New("This functionality is currently not implemented")
-	ErrFindingNote          = errors.New("Failed to find userNote")
-	ErrCreation             = errors.New("Failed to create userNote")
-	ErrUpdate               = errors.New("Failed to update userNote")
-	ErrDelete               = errors.New("Failed to delete userNote")
+	ErrNoNotesFound         = errors.New("no userNotes were found for given ID")
+	ErrNoSearchResultsFound = errors.New("no userNotes were found that matched the given criteria")
+	ErrNotImplemented       = errors.New("this functionality is currently not implemented")
+	ErrFindingNote          = errors.New("faailed to find userNote")
+	ErrCreation             = errors.New("failed to create userNote")
+	ErrUpdate               = errors.New("failed to update userNote")
+	ErrDelete               = errors.New("failed to delete userNote")
 )
 
 type UserNotesService struct {

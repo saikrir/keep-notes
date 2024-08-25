@@ -1,4 +1,4 @@
-package database
+package datastore
 
 import (
 	"context"
@@ -10,18 +10,11 @@ import (
 	"github.com/saikrir/keep-notes/internal/service"
 )
 
-type UserNoteRow struct {
-	ID          sql.NullString `db:"ID"`
-	Description sql.NullString `db:"DESCRIPTION"`
-	CreatedAt   sql.NullString `db:"CREATED_AT"`
-	Status      sql.NullString `db:"STATUS"`
-}
-
-type Database struct {
+type SQLiteStore struct {
 	Client *sqlx.DB
 }
 
-func NewDatabase() (*Database, error) {
+func NewDatabase() (*SQLiteStore, error) {
 	db, err := sqlx.Connect("sqlite3", "keepnotes.db")
 	if err != nil {
 		logger.Error("Failed to connect to database ", err)
@@ -34,10 +27,10 @@ func NewDatabase() (*Database, error) {
 	}
 
 	logger.Info("Connected to Database successfully")
-	return &Database{Client: db}, nil
+	return &SQLiteStore{Client: db}, nil
 }
 
-func (db *Database) InitSchema() error {
+func (db *SQLiteStore) InitSchema() error {
 	var schema = `
 			DROP TABLE IF EXISTS T_USER_NOTES;
 			CREATE TABLE T_USER_NOTES (
@@ -54,7 +47,7 @@ func (db *Database) InitSchema() error {
 	return nil
 }
 
-func (db *Database) CreateNote(ctx context.Context, note service.UserNote) (service.UserNote, error) {
+func (db *SQLiteStore) CreateNote(ctx context.Context, note service.UserNote) (service.UserNote, error) {
 	insertSQL := "INSERT INTO T_USER_NOTES(DESCRIPTION) values(:description) "
 	userNoteRow := ToUserNoteRow(note)
 
@@ -73,7 +66,7 @@ func (db *Database) CreateNote(ctx context.Context, note service.UserNote) (serv
 	return note, nil
 }
 
-func (db *Database) UpdateNote(ctx context.Context, ID string, existingNote service.UserNote) (service.UserNote, error) {
+func (db *SQLiteStore) UpdateNote(ctx context.Context, ID string, existingNote service.UserNote) (service.UserNote, error) {
 	updateSQL := "UPDATE T_USER_NOTES SET DESCRIPTION = :description, STATUS = :status where ID=:id"
 	exisitingRow := ToUserNoteRow(existingNote)
 	exisitingRow.ID = sql.NullString{String: ID, Valid: true}
@@ -88,7 +81,7 @@ func (db *Database) UpdateNote(ctx context.Context, ID string, existingNote serv
 	return ToUserNote(exisitingRow), nil
 }
 
-func (db *Database) DeleteNote(ctx context.Context, ID string) (service.UserNote, error) {
+func (db *SQLiteStore) DeleteNote(ctx context.Context, ID string) (service.UserNote, error) {
 	deleteSQL := "DELETE FROM T_USER_NOTES where ID = $1"
 
 	var (
@@ -109,7 +102,7 @@ func (db *Database) DeleteNote(ctx context.Context, ID string) (service.UserNote
 	return existingRow, nil
 }
 
-func (db *Database) GetNote(ctx context.Context, noteId string) (service.UserNote, error) {
+func (db *SQLiteStore) GetNote(ctx context.Context, noteId string) (service.UserNote, error) {
 	var userNoteRow UserNoteRow
 
 	selectSQL := "SELECT ID, DESCRIPTION, CREATED_AT, STATUS FROM T_USER_NOTES WHERE ID = $1"
@@ -122,7 +115,7 @@ func (db *Database) GetNote(ctx context.Context, noteId string) (service.UserNot
 	return ToUserNote(userNoteRow), nil
 }
 
-func (db *Database) SearchNote(ctx context.Context, searchTxt string) ([]service.UserNote, error) {
+func (db *SQLiteStore) SearchNote(ctx context.Context, searchTxt string) ([]service.UserNote, error) {
 	var (
 		searchResults []service.UserNote
 		returnRows    []UserNoteRow
@@ -142,7 +135,7 @@ func (db *Database) SearchNote(ctx context.Context, searchTxt string) ([]service
 
 }
 
-func (db *Database) GetAllRows(ctx context.Context) ([]service.UserNote, error) {
+func (db *SQLiteStore) GetAllRows(ctx context.Context) ([]service.UserNote, error) {
 	selectSQL := "SELECT ID, DESCRIPTION, CREATED_AT, STATUS FROM T_USER_NOTES"
 	var (
 		err        error
@@ -158,22 +151,4 @@ func (db *Database) GetAllRows(ctx context.Context) ([]service.UserNote, error) 
 		retResults = append(retResults, ToUserNote(row))
 	}
 	return retResults, nil
-}
-
-func ToUserNoteRow(note service.UserNote) UserNoteRow {
-	return UserNoteRow{
-		ID:          sql.NullString{String: note.ID, Valid: true},
-		Description: sql.NullString{String: note.Description, Valid: true},
-		CreatedAt:   sql.NullString{String: note.CreatedAt, Valid: true},
-		Status:      sql.NullString{String: note.Status, Valid: true},
-	}
-}
-
-func ToUserNote(noteRow UserNoteRow) service.UserNote {
-	return service.UserNote{
-		ID:          noteRow.ID.String,
-		Description: noteRow.Description.String,
-		CreatedAt:   noteRow.CreatedAt.String,
-		Status:      noteRow.Status.String,
-	}
 }

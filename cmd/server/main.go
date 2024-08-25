@@ -1,25 +1,32 @@
 package main
 
 import (
+	"context"
 	"runtime"
 
-	"github.com/saikrir/keep-notes/internal/database"
+	"github.com/saikrir/keep-notes/internal/datastore"
 	"github.com/saikrir/keep-notes/internal/logger"
 	"github.com/saikrir/keep-notes/internal/service"
 )
 
 func Run() error {
 	logger.Info("RUNNING ON ", runtime.GOOS, " Architecutre ", runtime.GOARCH)
-	db, err := database.NewDatabase()
+	db, err := datastore.NewOracleStore()
+
 	if err != nil {
-		panic(err.Error())
-	}
-	if err = db.InitSchema(); err != nil {
+		logger.Error("Failed to Connect to DB ", err)
 		panic(err.Error())
 	}
 
-	noteSvc := service.NewUserNotesService(db)
-	logger.Info("Service initialized ", noteSvc)
+	appNote := service.UserNote{
+		Description: "Sample",
+		Status:      "Active",
+	}
+
+	if _, err := db.CreateNote(context.Background(), appNote); err != nil {
+		logger.Error("Failed to create row ", err)
+	}
+
 	return nil
 }
 
