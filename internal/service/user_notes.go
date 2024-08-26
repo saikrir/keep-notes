@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"time"
 
@@ -44,14 +45,46 @@ func NewUserNotesService(store Store) *UserNotesService {
 
 func (userNoteSvc *UserNotesService) FindNote(ctx context.Context, ID string) (UserNote, error) {
 	logger.Debug("will try and locate Note with Id", ID)
-	return userNoteSvc.store.GetNote(ctx, ID)
+
+	note, err := userNoteSvc.store.GetNote(ctx, ID)
+	if err != nil {
+		if errors.Is(sql.ErrNoRows, err) {
+			logger.Error("No Rows found for NoteId ", ID)
+			return UserNote{}, ErrNoNotesFound
+		}
+		return UserNote{}, err
+	}
+
+	return note, nil
 }
 func (userNoteSvc *UserNotesService) SearchNotes(ctx context.Context, searchTxt string) ([]UserNote, error) {
-	return userNoteSvc.store.SearchNote(ctx, searchTxt)
+
+	results, err := userNoteSvc.store.SearchNote(ctx, searchTxt)
+
+	if err != nil {
+		if errors.Is(sql.ErrNoRows, err) {
+			logger.Error("No Rows found for Search Criteria ", searchTxt)
+			return nil, ErrNoSearchResultsFound
+		}
+		return results, err
+	}
+
+	return results, nil
 }
 
 func (userNoteSvc *UserNotesService) GetAllNotes(ctx context.Context) ([]UserNote, error) {
-	return userNoteSvc.store.GetAllRows(ctx)
+	logger.Info("Will get all rows ")
+	results, err := userNoteSvc.store.GetAllRows(ctx)
+	if err != nil {
+		logger.Error("No Rows found in DB ", err)
+		if errors.Is(sql.ErrNoRows, err) {
+			logger.Error("No Rows found in DB ", err)
+			return nil, ErrNoSearchResultsFound
+		}
+		return results, err
+	}
+
+	return results, nil
 }
 
 func (userNoteSvc *UserNotesService) NewNote(ctx context.Context, userNote UserNote) (UserNote, error) {
@@ -59,9 +92,35 @@ func (userNoteSvc *UserNotesService) NewNote(ctx context.Context, userNote UserN
 }
 
 func (userNoteSvc *UserNotesService) UpdateNote(ctx context.Context, ID string, userNote UserNote) (UserNote, error) {
+
+	if _, err := userNoteSvc.findExistingRow(ctx, ID); err != nil {
+		return UserNote{}, err
+	}
+
 	return userNoteSvc.store.UpdateNote(ctx, ID, userNote)
 }
 
 func (userNoteSvc *UserNotesService) RemoveNote(ctx context.Context, ID string) (UserNote, error) {
+
+	if _, err := userNoteSvc.findExistingRow(ctx, ID); err != nil {
+		return UserNote{}, err
+	}
 	return userNoteSvc.store.DeleteNote(ctx, ID)
+}
+
+func (userNoteSvc *UserNotesService) findExistingRow(ctx context.Context, ID string) (UserNote, error) {
+
+	var (
+		aUserNote UserNote
+		err       error
+	)
+
+	if aUserNote, err = userNoteSvc.store.GetNote(ctx, ID); err != nil {
+		logger.Error("Failed to find existing row to Update ", err)
+		if errors.Is(err, sql.ErrNoRows) {
+			return aUserNote, ErrNoNotesFound
+		}
+		return aUserNote, err
+	}
+	return aUserNote, nil
 }

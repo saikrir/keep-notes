@@ -1,0 +1,22 @@
+meta {
+  name: PutNote
+  type: http
+  seq: 5
+}
+
+put {
+  url: http://localhost:8080/v1/notesvc/notes/9
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.rqOi6suic4D64ppK8j0RY_vzqt4EKTEBUmxds1pTvaY
+}
+
+body:json {
+  {
+    "description": "I Love Samba2",
+    "status": "ACTIVE"
+  }
+}

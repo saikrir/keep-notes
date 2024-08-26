@@ -1,0 +1,15 @@
+meta {
+  name: GetAllNotes
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://localhost:8080/v1/notesvc/notes
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Beared 
+}

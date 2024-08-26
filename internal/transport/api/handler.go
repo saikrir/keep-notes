@@ -42,7 +42,7 @@ func NewHandler(rootContext string, port int, service NotesService) *Handler {
 
 	h.Server = &http.Server{
 		Addr:              fmt.Sprintf("0.0.0.0:%d", port),
-		Handler:           rootContextMux,
+		Handler:           LoggingMiddleware(JSONMiddleware(AuthMiddleware(rootContextMux))),
 		ReadTimeout:       1 * time.Second,
 		WriteTimeout:      1 * time.Second,
 		IdleTimeout:       30 * time.Second,
@@ -53,6 +53,11 @@ func NewHandler(rootContext string, port int, service NotesService) *Handler {
 
 func (h *Handler) mapRoutes() {
 	h.ApiRouter.HandleFunc("GET /notes", h.GetAllNotes)
+	h.ApiRouter.HandleFunc("GET /notes/{noteId}", h.GetNoteById)
+	h.ApiRouter.HandleFunc("POST /notes", h.PostNote)
+	h.ApiRouter.HandleFunc("PUT /notes/{noteId}", h.PutNote)
+	h.ApiRouter.HandleFunc("DELETE /notes/{noteId}", h.DeleteNote)
+	h.ApiRouter.HandleFunc("GET /", h.DefaultHandler)
 }
 
 func (h *Handler) Serve() error {

@@ -20,3 +20,5 @@ clean:
 
 run:
 	go run $(MAIN_FILE)
+lint:
+	$(HOME)/go/bin/golangci-lint run
