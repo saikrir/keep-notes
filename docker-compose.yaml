@@ -6,11 +6,30 @@ services:
     container_name: notes-oracle-db
     ports:
       - 1521:1521
+    healthcheck:
+      test: [ "CMD", "healthcheck.sh" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
     env_file:
       - ora.env
     volumes:
       - oracle-volume:/u01/app/oracle/oradata
       - ./db_scripts:/container-entrypoint-startdb.d
+    networks:
+      - fullstack
+
+  api:
+    build: .
+    container_name: "keep-notes-api"
+    env_file:
+      - app.env
+      - ora.env
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
     networks:
       - fullstack
 
