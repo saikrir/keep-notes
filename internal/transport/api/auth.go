@@ -37,8 +37,6 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		logger.Info("KEY ", authHeader[0])
-
 		authHeaderParts := strings.Split(authHeader[0], " ")
 		if len(authHeaderParts) != 2 || strings.ToLower(authHeaderParts[0]) != "bearer" {
 			w.WriteHeader(http.StatusUnauthorized)
