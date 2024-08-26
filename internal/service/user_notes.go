@@ -19,6 +19,7 @@ type Store interface {
 	UpdateNote(context.Context, string, UserNote) (UserNote, error)
 	DeleteNote(context.Context, string) (UserNote, error)
 	SearchNote(context.Context, string) ([]UserNote, error)
+	GetAllRows(context.Context) ([]UserNote, error)
 }
 
 var (
@@ -47,6 +48,10 @@ func (userNoteSvc *UserNotesService) FindNote(ctx context.Context, ID string) (U
 }
 func (userNoteSvc *UserNotesService) SearchNotes(ctx context.Context, searchTxt string) ([]UserNote, error) {
 	return userNoteSvc.store.SearchNote(ctx, searchTxt)
+}
+
+func (userNoteSvc *UserNotesService) GetAllNotes(ctx context.Context) ([]UserNote, error) {
+	return userNoteSvc.store.GetAllRows(ctx)
 }
 
 func (userNoteSvc *UserNotesService) NewNote(ctx context.Context, userNote UserNote) (UserNote, error) {

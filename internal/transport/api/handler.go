@@ -4,8 +4,11 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os"
+	"os/signal"
 	"time"
 
+	"github.com/saikrir/keep-notes/internal/logger"
 	"github.com/saikrir/keep-notes/internal/service"
 )
 
@@ -15,6 +18,7 @@ type NotesService interface {
 	NewNote(context.Context, service.UserNote) (service.UserNote, error)
 	UpdateNote(context.Context, string, service.UserNote) (service.UserNote, error)
 	RemoveNote(context.Context, string) (service.UserNote, error)
+	GetAllNotes(context.Context) ([]service.UserNote, error)
 }
 
 type Handler struct {
@@ -48,14 +52,25 @@ func NewHandler(rootContext string, port int, service NotesService) *Handler {
 }
 
 func (h *Handler) mapRoutes() {
-	h.ApiRouter.HandleFunc("/hello", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hello World")
-	})
+	h.ApiRouter.HandleFunc("GET /notes", h.GetAllNotes)
 }
 
 func (h *Handler) Serve() error {
-	if err := h.Server.ListenAndServe(); err != nil {
-		return err
-	}
+
+	go func() {
+		if err := h.Server.ListenAndServe(); err != nil {
+			logger.Error("Server will stop ", err)
+		}
+	}()
+
+	// These 3 lines, capture CTRL+C and pass control to the app
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, os.Interrupt)
+	<-sigChan
+
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	h.Server.Shutdown(ctx)
+	logger.Info("Server has shutdown")
 	return nil
 }

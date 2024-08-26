@@ -30,7 +30,7 @@ var ErrNoRowsFound = errors.New("no Rows found for query criteria ")
 func NewOracleStore() (*OracleStore, error) {
 
 	// Need following env vars
-	// $DB_HOST, $DB_PORT, $DB_NAME, $DB_USER, $DB_PASS
+	// $DB_HOST, $DB_PORT, $DB_NAME, $DB_USER, $DB_PASS\
 
 	connStr := go_ora.BuildUrl(
 		env.GetEnvValAsString("DB_HOST"),
@@ -177,7 +177,7 @@ func (db *OracleStore) SearchNote(ctx context.Context, searchTxt string) ([]serv
 		err           error
 	)
 
-	searchSQL := "SELECT ID, DESCRIPTION, CREATED_AT, STATUS FROM T_USER_NOTES WHERE lower(DESCRIPTION) LIKE $1"
+	searchSQL := "SELECT ID, DESCRIPTION, CREATED_AT, STATUS FROM APP_USER.T_USER_NOTES WHERE lower(DESCRIPTION) LIKE $1"
 	if err = db.Client.SelectContext(ctx, &returnRows, searchSQL, "%"+searchTxt+"%"); err != nil {
 
 		if errors.Is(sql.ErrNoRows, err) {
@@ -197,7 +197,7 @@ func (db *OracleStore) SearchNote(ctx context.Context, searchTxt string) ([]serv
 }
 
 func (db *OracleStore) GetAllRows(ctx context.Context) ([]service.UserNote, error) {
-	selectSQL := "SELECT ID, DESCRIPTION, CREATED_AT, STATUS FROM T_USER_NOTES"
+	selectSQL := "SELECT ID, DESCRIPTION, CREATED_AT, STATUS FROM APP_USER.T_USER_NOTES"
 	var (
 		err        error
 		rows       []UserNoteRow
