@@ -7,15 +7,16 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/saikrir/keep-notes/internal/logger"
 	"github.com/saikrir/keep-notes/internal/service"
 )
 
 type Note struct {
 	ID          string `json:"id"`
-	Description string `json:"description"`
+	Description string `json:"description" validate:"required"`
 	CreatedAt   string `json:"createdAt"`
-	Status      string `json:"status"`
+	Status      string `json:"status" validate:"required"`
 }
 
 func (h *Handler) GetAllNotes(w http.ResponseWriter, r *http.Request) {
@@ -67,6 +68,13 @@ func (h *Handler) PostNote(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
+	validator := validator.New()
+	if err = validator.Struct(aNote); err != nil {
+		logger.Error("request did no pass validation", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	userNote = ToUserNote(aNote)
 
 	if userNote, err = h.Service.NewNote(r.Context(), userNote); err != nil {
@@ -89,6 +97,13 @@ func (h *Handler) PutNote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer r.Body.Close()
+
+	validator := validator.New()
+	if err = validator.Struct(aNote); err != nil {
+		logger.Error("request did no pass validation", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 
 	noteId := r.PathValue("noteId")
 	userNote = ToUserNote(aNote)
