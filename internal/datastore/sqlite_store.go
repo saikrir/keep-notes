@@ -14,7 +14,7 @@ type SQLiteStore struct {
 	Client *sqlx.DB
 }
 
-func NewDatabase() (*SQLiteStore, error) {
+func NewSQLliteStore(initSchema bool) (*SQLiteStore, error) {
 	db, err := sqlx.Connect("sqlite3", "keepnotes.db")
 	if err != nil {
 		logger.Error("Failed to connect to database ", err)
@@ -26,8 +26,16 @@ func NewDatabase() (*SQLiteStore, error) {
 		return nil, err
 	}
 
+	instance := &SQLiteStore{Client: db}
+
+	if initSchema {
+		if err = instance.InitSchema(); err != nil {
+			return nil, err
+		}
+	}
+
 	logger.Info("Connected to Database successfully")
-	return &SQLiteStore{Client: db}, nil
+	return instance, nil
 }
 
 func (db *SQLiteStore) InitSchema() error {
@@ -36,7 +44,7 @@ func (db *SQLiteStore) InitSchema() error {
 			CREATE TABLE T_USER_NOTES (
 				ID INTEGER PRIMARY KEY AUTOINCREMENT,
 		    	DESCRIPTION VARCHAR(80)  NOT NULL,
-			    CREATED_AT TEXT  DEFAULT CURRENT_TIMESTAMP,
+			    CREATED_AT DATETIME NOT NULL DEFAULT (DATETIME('now','localtime')),
 				STATUS  VARCHAR(10) DEFAULT 'ACTIVE'
 			); `
 
@@ -67,16 +75,20 @@ func (db *SQLiteStore) CreateNote(ctx context.Context, note service.UserNote) (s
 }
 
 func (db *SQLiteStore) UpdateNote(ctx context.Context, ID string, existingNote service.UserNote) (service.UserNote, error) {
-	updateSQL := "UPDATE T_USER_NOTES SET DESCRIPTION = :description, STATUS = :status where ID=:id"
+	updateSQL := "UPDATE T_USER_NOTES SET DESCRIPTION=:1, STATUS=:2 where ID=:3"
 	exisitingRow := ToUserNoteRow(existingNote)
 	exisitingRow.ID = sql.NullString{String: ID, Valid: true}
 
-	_, err := db.Client.NamedExecContext(ctx, updateSQL, existingNote)
+	result, err := db.Client.ExecContext(ctx, updateSQL, exisitingRow.Description, exisitingRow.Status, exisitingRow.ID)
 
 	if err != nil {
 		logger.Error("Failed to update ", err)
 		return service.UserNote{}, err
 	}
+
+	nRows, _ := result.RowsAffected()
+
+	logger.Info("Rows Updated ", nRows)
 
 	return ToUserNote(exisitingRow), nil
 }

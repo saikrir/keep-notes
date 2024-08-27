@@ -14,8 +14,7 @@ const ApiRootContext = "/v1/notesvc"
 
 func Run() error {
 	logger.Info("RUNNING ON ", runtime.GOOS, " Architecutre ", runtime.GOARCH)
-	dataStore, err := datastore.NewOracleStore()
-
+	dataStore, err := datastore.NewSQLliteStore(true)
 	if err != nil {
 		logger.Error("Failed to Connect to DB ", err)
 		return err

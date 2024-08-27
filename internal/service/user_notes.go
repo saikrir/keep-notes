@@ -94,6 +94,7 @@ func (userNoteSvc *UserNotesService) NewNote(ctx context.Context, userNote UserN
 func (userNoteSvc *UserNotesService) UpdateNote(ctx context.Context, ID string, userNote UserNote) (UserNote, error) {
 
 	if _, err := userNoteSvc.findExistingRow(ctx, ID); err != nil {
+		logger.Debug("Inside Not found ", err)
 		return UserNote{}, err
 	}
 
