@@ -16,7 +16,7 @@ init-build-dirs:
 	$(info $(BUILD_PATH) was created)
 build-api: init-build-dirs
 	$(info Will build API for $(GOOS) and $(GOARCH))
-	GOOS=$(GOOS) GOARCH=$(GOARCH) CGO_ENABLED=1 go build -o $(BUILD_PATH)/$(PROJECT_NAME) $(MAIN_FILE)
+	GOOS=$(GOOS) GOARCH=$(GOARCH) CGO_ENABLED=0 go build -o $(BUILD_PATH)/$(PROJECT_NAME) $(MAIN_FILE)
 	@echo "API build completed"
 clean:
 	@rm -rf $(BUILD_PATH)
