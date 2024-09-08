@@ -20,10 +20,10 @@ Columns:
 
 ### Need following env entries in .env file
 
-export API_PORT=8080
-export DB_PORT=1521
-export DB_HOST=localhost
-export DB_NAME=XEPDB1
-export DB_USER=app_user
-export DB_PASS=
-export SIGNING_KEY=
+- export API_PORT=8080
+- export DB_PORT=1521
+- export DB_HOST=localhost
+- export DB_NAME=XEPDB1
+- export DB_USER=app_user
+- export DB_PASS=
+- export SIGNING_KEY= (Optional if only AuthMiddleware is enabled)

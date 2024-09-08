@@ -42,7 +42,7 @@ func NewHandler(rootContext string, port int, service NotesService) *Handler {
 
 	h.Server = &http.Server{
 		Addr:              fmt.Sprintf("0.0.0.0:%d", port),
-		Handler:           LoggingMiddleware(JSONMiddleware(AuthMiddleware(rootContextMux))),
+		Handler:           LoggingMiddleware(JSONMiddleware(rootContextMux)),
 		ReadTimeout:       1 * time.Second,
 		WriteTimeout:      1 * time.Second,
 		IdleTimeout:       30 * time.Second,
